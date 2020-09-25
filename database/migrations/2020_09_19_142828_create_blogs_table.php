@@ -17,9 +17,11 @@ class CreateBlogsTable extends Migration
             $table->bigIncrements('BlogID');
             $table->string('Name');
             $table->integer('BlogCategoryID');
-            $table->string('BannerImage');
-            $table->string('MainImage');
-            $table->string('Description');
+            $table->string('BannerImage')->default('0');
+            $table->string('BannerImgPath')->default('0');
+            $table->string('MainImage')->default('0');
+            $table->string('mainimgpath')->default('0');
+            $table->longText('Description');
             $table->tinyInteger('Status')->default('1');
             $table->timestamps();
         });

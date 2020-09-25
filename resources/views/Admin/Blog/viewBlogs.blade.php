@@ -76,18 +76,12 @@
                                        <td>{{$blog->Name}}</td>
                                        <td>{{$blog->BlogCategoryID}}</td>
 
-                                       <td>@php if (!empty($blog->BannerImage)) { @endphp
-                                       <img src="{{url('/uploads/blog/'.$blog->BannerImage)}}" style="height: 150px; width: 150px" >
-                                       @php } else { @endphp 
-                                       <p>No image found</p>
-                                       @php } @endphp
+                                        <td>
+                                       <img src="<?php echo asset("storage/$blog->BannerImage")?>" style="height: 150px; width: 150px" >
                                        </td>
 
-                                       <td>@php if (!empty($blog->MainImage)) { @endphp
-                                       <img src="{{url('/uploads/blog/'.$blog->MainImage)}}" style="height: 150px; width: 150px" >
-                                       @php } else { @endphp 
-                                       <p>No image found</p>
-                                       @php } @endphp
+                                       <td>
+                                       <img src="<?php echo asset("storage/$blog->MainImage")?>" style="height: 150px; width: 150px" >
                                        </td>
 
                                        <td>{{$blog->Description}}</td>

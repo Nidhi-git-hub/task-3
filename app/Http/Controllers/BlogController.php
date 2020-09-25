@@ -11,26 +11,37 @@ use App\BlogKeyword;
 class BlogController extends Controller
 {
     public function addBlog(Request $request){
-    	if($request->isMethod('post')){
+        if($request->isMethod('post')){
             $data = $request->all();
             // echo "<pre>";print_r($data);die;
-
-            $banner=$request->file('banner_image');
-            $bannerImage='banner_image' . time().'.'.$request->banner_image->extension();
-            $banner->move("uploads/blog/",$bannerImage);
-
-            $main=$request->file('main_image');
-            $mainImage='main_image' . time().'.'.$request->main_image->extension();
-            $main->move("uploads/blog/",$mainImage);
 
             $blog = new Blog;
             $blog->Name=$data['blog_name'];
             $blog->BlogCategoryID=$data['category_id'];
-            $blog->BannerImage=$bannerImage;            
-            $blog->MainImage=$mainImage;
             $blog->Description=$data['blog_description'];
-        	$blog->save();
-        	return redirect('/admin/view-blogs')->with('flash_message_success','Blog has been added successfully');
+            $blog->save();
+
+            $url="http://127.0.0.1:8000/storage/";
+            $banner=$request->file('banner_image');
+
+            $bannerPath=$request->file('banner_image')->storeAs('images', 'banner_image' . time().'.'.$request->banner_image->extension());
+
+            $blog->BannerImage=$bannerPath;
+            $blog->BannerImgPath=$url.$bannerPath;
+            $blog->save();
+
+
+            $url="http://127.0.0.1:8000/storage/";
+            $main=$request->file('main_image');
+
+            $mainPath=$request->file('main_image')->storeAs('images', 'main_image' . time().'.'.$request->main_image->extension());
+
+            $blog->MainImage=$mainPath;
+            $blog->mainimgpath=$url.$mainPath;
+            $blog->save();
+
+
+            return redirect('/admin/view-blogs')->with('flash_message_success','Blog has been added successfully');
         }
         // Category Dropdown Menu Code
         $category = BlogCategory::where(['status'=>1])->get();
@@ -38,12 +49,47 @@ class BlogController extends Controller
         foreach($category as $cat){
             $category_dropdown.="<option value='".$cat->CategoryID."'>".$cat->CategoryName."</option>";
         }
-    	return view('Admin.Blog.addBlog')->with(compact('category_dropdown'));
+        return view('Admin.Blog.addBlog')->with(compact('category_dropdown'));
     }
     public function viewBlogs(){
-    	$blogs = Blog::get();
-    	return view('Admin.Blog.viewBlogs')->with(compact('blogs'));
+        $blogs = Blog::get();
+        return view('Admin.Blog.viewBlogs')->with(compact('blogs'));
     }
+    public function apiBlogs(){
+        $blogs = Blog::get();
+        if($blogs->count()){
+            return response()->json($data = [
+            'status' => 200,
+            'msg'=>'Success',
+            'Blog' => $blogs
+            ]);
+        }
+        else{
+            return response()->json($data = [
+            'status' => 201,
+            'msg' => 'Data Not Found'
+            ]);
+        }
+    }
+    public function show($BlogID){
+
+        $blogDetails =Blog::find($BlogID);
+           
+        //dd($blogDetails);
+        if($blogDetails->count()){
+            return response()->json($data = [
+            'status' => 200,
+            'msg'=>'Success',
+            'Blog' => $blogDetails
+            ]);
+        }
+        else{
+            return response()->json($data = [
+            'status' => 201,
+            'msg' => 'Data Not Found'
+            ]);
+        }    
+     }
     public function editBlog(Request $request,$BlogID=null)
     {
         if($request->isMethod('post')){
@@ -51,26 +97,30 @@ class BlogController extends Controller
 
                 $blog=Blog::find($request->BlogID);
                 $blog->Name=$data['blog_name'];
-            	$blog->BlogCategoryID=$data['category_id'];
-            	$blog->Description=$data['blog_description'];
+                $blog->BlogCategoryID=$data['category_id'];
+                $blog->Description=$data['blog_description'];
                 $blog->save();
 
                 if($request->hasFile('banner_image')){
-                	$banner=$request->file('banner_image');
-                	$bannerImage='banner_image' . time().'.'.$request->banner_image->extension();
-                	$banner->move("uploads/blog/",$bannerImage);
+                    $url="http://127.0.0.1:8000/storage/";
+                    $banner=$request->file('banner_image');
 
-                	$blog->BannerImage=$bannerImage;
-                	$blog->save();
-            	}
-            	if($request->hasFile('main_image')){
-                	$main=$request->file('main_image');
-                	$mainImage='main_image' . time().'.'.$request->main_image->extension();
-                	$main->move("uploads/blog/",$mainImage);
+                    $bannerPath=$request->file('banner_image')->storeAs('images', 'banner_image' . time().'.'.$request->banner_image->extension());
 
-                	$blog->MainImage=$mainImage;
-                	$blog->save();
-            	}
+                    $blog->BannerImage=$bannerPath;
+                    $blog->BannerImgPath=$url.$bannerPath;
+                    $blog->save();
+                }
+                if($request->hasFile('main_image')){
+                    $url="http://127.0.0.1:8000/storage/";
+                    $main=$request->file('main_image');
+
+                    $mainPath=$request->file('main_image')->storeAs('images', 'main_image' . time().'.'.$request->main_image->extension());
+
+                    $blog->MainImage=$mainPath;
+                    $blog->mainimgpath=$url.$mainPath;
+                    $blog->save();
+                }
             return redirect('/admin/view-blogs')->with('flash_message_success','Blog has been updated');
         }
         $blogDetails = Blog::where(['BlogID'=>$BlogID])->first();

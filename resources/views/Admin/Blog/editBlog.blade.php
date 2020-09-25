@@ -57,12 +57,12 @@
                               </div>
                               <div class="form-group">
                                  <label>Banner Image</label>
-                                 <img src="{{url('/uploads/blog/'.$blogDetails->BannerImage)}}" style="height: 150px;width: 150px">
+                                 <img src="<?php echo asset("storage/$blogDetails->BannerImage")?>" style="height: 150px;width: 150px">
                                  <input type="file" name="banner_image" id="banner_image" value="{{asset($blogDetails->BannerImage)}}">
                               </div>
                               <div class="form-group">
                                  <label>Main Image</label>
-                                 <img src="{{url('/uploads/blog/'.$blogDetails->MainImage)}}" style="height: 150px;width: 150px">
+                                 <img src="<?php echo asset("storage/$blogDetails->MainImage")?>" style="height: 150px;width: 150px">
                                  <input type="file" name="main_image" id="main_image" value="{{asset($blogDetails->MainImage)}}">
                               </div>
                               <div class="form-group">
